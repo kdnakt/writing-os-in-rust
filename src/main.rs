@@ -1,11 +1,13 @@
 // disable standard library, not to use libc etc.
 #![no_std]
+// overwriting the entry point
+#![no_main]
 
 use core::panic::PanicInfo;
 
-fn main() {
-    // println!("Hello, world!");
-}
+// fn main() {
+//     // println!("Hello, world!");
+// }
 
 // ! is the "never" type
 #[panic_handler]
