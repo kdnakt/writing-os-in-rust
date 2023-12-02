@@ -5,6 +5,8 @@
 
 use core::panic::PanicInfo;
 
+mod vga_buffer;
+
 // fn main() {
 //     // println!("Hello, world!");
 // }
