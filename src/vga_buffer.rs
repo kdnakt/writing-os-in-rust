@@ -73,6 +73,16 @@ impl Writer {
         }
     }
 
+    pub fn write_string(&mut self, s: &str) {
+        for byte in s.bytes() {
+            match byte {
+                // printable ascii byte or newline
+                0x20..=0x7e | b'\n' => self.write_byte(byte),
+                // not part of printable ascii range
+                _ => self.write_byte(0xfe),
+            }
+        }
+    }
     fn new_line(&mut self) {
         // TODO
     }
