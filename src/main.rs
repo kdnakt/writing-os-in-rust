@@ -20,6 +20,8 @@ fn panic(info: &PanicInfo) -> ! {
 
 static HELLO: &[u8] = b"Hello World";
 
+#![reexport_test_harness_main = "test_main"]
+
 // disable name mangling to ensure the name "_start"
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
@@ -42,5 +44,26 @@ pub extern "C" fn _start() -> ! {
 
     // panic!("Some panic message");
 
+    #[cfg(test)]
+    test_main();
+
     loop {}
+}
+
+#![feature(custom_test_frameworks)]
+#![test_runner(crate::test_runner)]
+
+#[cfg(test)]
+fn test_runner(tests: &[&dyn Fn()]) {
+    println!("Running {} tests", tests.len());
+    for test in tests {
+        test();
+    }
+}
+
+#[test_case]
+fn trivial_assertion() {
+    print!("trivial assertion... ");
+    assert_eq!(1, 1);
+    println!("[ok]");
 }
