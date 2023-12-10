@@ -163,3 +163,11 @@ fn test_println_simple() {
     // test if there's no panic!
     println!("test_println_simple output");
 }
+
+#[test_case]
+fn test_println_many() {
+    // test if there's no panic!
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
+}
