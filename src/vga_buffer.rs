@@ -157,3 +157,9 @@ pub fn print_something() {
     writer.write_string("Wörld!");
     write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
 }
+
+#[test_case]
+fn test_println_simple() {
+    // test if there's no panic!
+    println!("test_println_simple output");
+}
