@@ -49,6 +49,11 @@ pub extern "C" fn _start() -> ! {
 
     println!("Hello World{}", "!");
 
+    blog_os::init();
+
+    // invoke a breakpoint exception
+    x86_64::instructions::interrupts::int3();
+
     // panic!("Some panic message");
 
     #[cfg(test)]
