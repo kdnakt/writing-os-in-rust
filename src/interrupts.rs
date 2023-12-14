@@ -4,10 +4,14 @@ use x86_64::structures::idt::{
 };
 use crate::println;
 
+static mut IDT: InterruptDescriptorTable = InterruptDescriptorTable::new();
+
 /// initializes Interrupt Descriptor Table
 pub fn init_idt() {
-    let mut idt = InterruptDescriptorTable::new();
-    idt.breakpoint.set_handler_fn(breakpoint_handler);
+    unsafe {
+        IDT.breakpoint.set_handler_fn(breakpoint_handler);
+        IDT.load();
+    }
 }
 
 extern "x86-interrupt" fn breakpoint_handler(
