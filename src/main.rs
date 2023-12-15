@@ -52,9 +52,16 @@ pub extern "C" fn _start() -> ! {
     blog_os::init();
 
     // invoke a breakpoint exception
-    x86_64::instructions::interrupts::int3();
+    // x86_64::instructions::interrupts::int3();
 
     // panic!("Some panic message");
+
+    // trigger a double fault
+    unsafe {
+        // deadbeef is an invalid address, so a page fault occurs.
+        // if our IDT doesn't have a page fault handler, a double fault occurs.
+        *(0xdeadbeef as *mut u8) = 42;
+    };
 
     #[cfg(test)]
     test_main();
