@@ -57,11 +57,18 @@ pub extern "C" fn _start() -> ! {
     // panic!("Some panic message");
 
     // trigger a double fault
-    unsafe {
-        // deadbeef is an invalid address, so a page fault occurs.
-        // if our IDT doesn't have a page fault handler, a double fault occurs.
-        *(0xdeadbeef as *mut u8) = 42;
-    };
+    // unsafe {
+    //     // deadbeef is an invalid address, so a page fault occurs.
+    //     // if our IDT doesn't have a page fault handler, a double fault occurs.
+    //     *(0xdeadbeef as *mut u8) = 42;
+    // };
+
+    // trigger stack overflow
+    fn stack_overflow() {
+        // for each recursion, the return address is pushed
+        stack_overflow();
+    }
+    stack_overflow();
 
     #[cfg(test)]
     test_main();
