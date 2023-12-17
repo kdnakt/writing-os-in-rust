@@ -5,6 +5,8 @@ use x86_64::structures::idt::{
 use crate::println;
 use crate::gdt;
 use lazy_static::lazy_static;
+use pic8259::ChainedPics;
+use spin;
 
 // uses unsafe inside
 lazy_static! {
@@ -36,6 +38,12 @@ extern "x86-interrupt" fn double_fault_handler(
 ) -> ! {
     panic!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
 }
+
+pub const PIC_1_OFFSET: u8 = 32;
+pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
+
+pub static PICS: spin::Mutex<ChainedPics> =
+    spin::Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
 
 #[test_case]
 fn test_breakpoint_exception() {

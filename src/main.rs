@@ -64,11 +64,11 @@ pub extern "C" fn _start() -> ! {
     // };
 
     // trigger stack overflow
-    fn stack_overflow() {
-        // for each recursion, the return address is pushed
-        stack_overflow();
-    }
-    stack_overflow();
+    // fn stack_overflow() {
+    //     // for each recursion, the return address is pushed
+    //     stack_overflow();
+    // }
+    // stack_overflow();
 
     #[cfg(test)]
     test_main();
