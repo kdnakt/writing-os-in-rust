@@ -3,6 +3,7 @@ use x86_64::structures::idt::{
     InterruptStackFrame,
 };
 use crate::println;
+use crate::print;
 use crate::gdt;
 use lazy_static::lazy_static;
 use pic8259::ChainedPics;
@@ -17,6 +18,8 @@ lazy_static! {
             idt.double_fault.set_handler_fn(double_fault_handler)
                 .set_stack_index(gdt::DOUBLE_FAULT_IST_INDEX);
         }
+        idt[InterruptIndex::Timer.as_usize()]
+            .set_handler_fn(timer_interrupt_handler);
         idt
     };
 }
@@ -24,6 +27,28 @@ lazy_static! {
 /// initializes Interrupt Descriptor Table
 pub fn init_idt() {
     IDT.load();
+}
+
+#[derive(Debug, Clone, Copy)]
+#[repr(u8)]
+pub enum InterruptIndex {
+    Timer = PIC_1_OFFSET,
+}
+
+impl InterruptIndex {
+    fn as_u8(self) -> u8 {
+        self as u8
+    }
+
+    fn as_usize(self) -> usize {
+        usize::from(self.as_u8())
+    }
+}
+
+extern "x86-interrupt" fn timer_interrupt_handler(
+    _stack_frame: InterruptStackFrame,
+) {
+    print!(".");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(
