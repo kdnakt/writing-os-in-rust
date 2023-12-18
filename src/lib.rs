@@ -18,6 +18,8 @@ pub fn init() {
     unsafe {
         interrupts::PICS.lock().initialize()
     };
+    // by default, cpu ignores interrupts. so enabling interrupts
+    x86_64::instructions::interrupts::enable();
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
