@@ -18,7 +18,8 @@ use blog_os::println;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    // loop {}
+    blog_os::hlt_loop();
 }
 
 #[cfg(test)]
@@ -74,10 +75,11 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("It did not crash");
-    loop {
-        use blog_os::print;
-        print!("-"); // this may cause deadlock
-    }
+    // loop {
+    //     use blog_os::print;
+    //     print!("-"); // this may cause deadlock
+    // }
+    blog_os::hlt_loop();
 }
 
 #[test_case]
