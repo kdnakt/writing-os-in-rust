@@ -74,7 +74,10 @@ pub extern "C" fn _start() -> ! {
     test_main();
 
     println!("It did not crash");
-    loop {}
+    loop {
+        use blog_os::print;
+        print!("-"); // this may cause deadlock
+    }
 }
 
 #[test_case]
