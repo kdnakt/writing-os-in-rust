@@ -71,6 +71,10 @@ pub extern "C" fn _start() -> ! {
     // }
     // stack_overflow();
 
+    // cause page fault by accessing memory outside the kernel
+    let ptr = 0xdeadbeaf as *mut u8;
+    unsafe { *ptr = 42; }
+
     #[cfg(test)]
     test_main();
 
