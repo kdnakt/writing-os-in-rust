@@ -6,6 +6,10 @@
 #![test_runner(blog_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+use bootloader::{
+    BootInfo,
+    entry_point,
+};
 use core::panic::PanicInfo;
 use blog_os::println;
 
@@ -28,11 +32,14 @@ fn panic(info: &PanicInfo) -> ! {
     blog_os::test_panic_handler(info)
 }
 
+entry_point!(kernel_main);
+
 // static HELLO: &[u8] = b"Hello World";
 
 // disable name mangling to ensure the name "_start"
 #[no_mangle]
-pub extern "C" fn _start() -> ! {
+// pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // let vga_buffer = 0xb8000 as *mut u8;
 
     // for (i, &byte) in HELLO.iter().enumerate() {
