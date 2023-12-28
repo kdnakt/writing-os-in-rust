@@ -40,12 +40,9 @@ entry_point!(kernel_main);
 #[no_mangle]
 // pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
-    use blog_os::memory::{
-        active_level_4_table,
-        translate_addr,
-    };
+    use blog_os::memory;
     use x86_64::VirtAddr;
-    use x86_64::structures::paging::PageTable;
+    use x86_64::structures::paging::Translate;
 
     // let vga_buffer = 0xb8000 as *mut u8;
 
@@ -100,6 +97,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // println!("Level 4 page table at: {:?}", level_4_page_table.start_address());
 
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mapper = unsafe { memory::init(phys_mem_offset) };
     // let l4_table = unsafe { active_level_4_table(phys_mem_offset) };
 
     // for (i, entry) in l4_table.iter().enumerate() {
@@ -132,7 +130,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     for &address in &addresses {
         let virt = VirtAddr::new(address);
-        let phys = unsafe { translate_addr(virt, phys_mem_offset) };
+        let phys = mapper.translate_addr(virt);
         println!("{:?} -> {:?}", virt, phys);
     }
 
