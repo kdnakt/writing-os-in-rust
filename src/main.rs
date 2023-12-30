@@ -103,6 +103,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     let mut mapper = unsafe { memory::init(phys_mem_offset) };
     let mut frame_allocator = memory::EmptyFrameAllocator;
     let page = Page::containing_address(VirtAddr::new(0));
+    // frame allocation fails for wrong address
+    // let page = Page::containing_address(VirtAddr::new(0xdeadbeaf000));
     memory::create_example_mapping(page, &mut mapper, &mut frame_allocator);
 
     // print `New!`
