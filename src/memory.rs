@@ -11,7 +11,10 @@ use x86_64::{
     VirtAddr,
     PhysAddr,
 };
-use bootloader::bootinfo::MemoryMap;
+use bootloader::bootinfo::{
+    MemoryMap,
+    MemoryRegionType,
+};
 
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
     let level_4_table = active_level_4_table(physical_memory_offset);
@@ -102,5 +105,15 @@ impl BootInfoFrameAllocator {
             memory_map,
             next: 0,
         }
+    }
+
+    fn usable_frames(&self) -> impl Iterator<Item = PhysFrame> {
+        let regions = self.memory_map.iter();
+        let usable_regions = regions
+            .filter(|r| r.region_type == MemoryRegionType::Usable);
+        let addr_ranges = usable_regions
+            .map(|r| r.range.start_addr()..r.range.end_addr());
+        let frame_addresses = addr_ranges.flat_map(|r| r.step_by(4096));
+        frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr)))
     }
 }
