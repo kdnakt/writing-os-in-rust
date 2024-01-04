@@ -6,6 +6,9 @@
 #![test_runner(blog_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
+
+use alloc::boxed::Box;
 use bootloader::{
     BootInfo,
     entry_point,
@@ -149,6 +152,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         let phys = mapper.translate_addr(virt);
         println!("{:?} -> {:?}", virt, phys);
     }
+
+    let x = Box::new(41);
 
     #[cfg(test)]
     test_main();
