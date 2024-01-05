@@ -153,7 +153,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         println!("{:?} -> {:?}", virt, phys);
     }
 
-    let x = Box::new(41);
+    // allocation error test
+    // let x = Box::new(41);
 
     #[cfg(test)]
     test_main();
