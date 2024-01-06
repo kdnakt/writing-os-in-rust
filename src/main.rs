@@ -43,6 +43,7 @@ entry_point!(kernel_main);
 #[no_mangle]
 // pub extern "C" fn _start(boot_info: &'static BootInfo) -> ! {
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use blog_os::allocator;
     use blog_os::memory;
     use blog_os::memory::BootInfoFrameAllocator;
     use x86_64::VirtAddr;
@@ -155,6 +156,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     // allocation error test
     // let x = Box::new(41);
+
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+        .expect("heap initialization failed");
+    let x = Box::new(41);
 
     #[cfg(test)]
     test_main();
