@@ -38,6 +38,11 @@ pub fn init_heap(
         };
     }
 
+    // init() writes to heap memory, so we have to map pages before initialization.
+    unsafe {
+        ALLOCATOR.lock().init(HEAP_START, HEAP_SIZE);
+    }
+
     Ok(())
 }
 
