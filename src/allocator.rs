@@ -64,13 +64,19 @@ impl<A> Locked<A> {
     }
 }
 
+/// 与えられたアドレス`addr`を`align`に上丸めする
+/// 
+/// `align`は2の累乗でなければならない
 fn align_up(addr: usize, align: usize) -> usize {
-    let remainder = addr % align;
-    if remainder == 0 {
-        addr
-    } else {
-        addr - remainder + align
-    }
+    // let remainder = addr % align;
+    // if remainder == 0 {
+    //     addr
+    // } else {
+    //     addr - remainder + align
+    // }
+
+    // more efficient and faster way
+    (addr + align - 1) & !(align - 1)
 }
 
 #[global_allocator]
