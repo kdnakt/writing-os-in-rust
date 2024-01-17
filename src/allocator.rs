@@ -15,6 +15,8 @@ use linked_list_allocator::LockedHeap;
 
 pub mod bump;
 
+use bump::BumpAllocator;
+
 pub const HEAP_START: usize = 0x_4444_4444_0000;
 pub const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
 
@@ -81,7 +83,8 @@ fn align_up(addr: usize, align: usize) -> usize {
 
 #[global_allocator]
 // static ALLOCATOR: Dummy = Dummy;
-static ALLOCATOR: LockedHeap = LockedHeap::empty();
+// static ALLOCATOR: LockedHeap = LockedHeap::empty();
+static ALLOCATOR: Locked<BumpAllocator> = Locked::new(BumpAllocator::new());
 
 pub struct Dummy;
 
