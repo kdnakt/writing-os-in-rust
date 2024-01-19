@@ -14,6 +14,7 @@ use x86_64::{
 use linked_list_allocator::LockedHeap;
 
 pub mod bump;
+pub mod linked_list;
 
 use bump::BumpAllocator;
 
