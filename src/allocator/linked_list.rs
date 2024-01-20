@@ -45,4 +45,41 @@ impl LinkedListAllocator {
         node_ptr.write(node);
         self.head.next = Some(&mut *node_ptr);
     }
+
+    fn find_region(&mut self, size: usize, align: usize)
+        -> Option<(&'static mut ListNode, usize)>
+    {
+        let mut current = &mut self.head;
+        while let Some(ref mut region) = current.next {
+            if let Ok(alloc_start) = Self::alloc_from_region(&region, size, align) {
+                let next = region.next.take();
+                let ret = Some((current.next.take().unwrap(), alloc_start));
+                current.next = next;
+                return ret;
+            } else {
+                current = current.next.as_mut().unwrap();
+            }
+        }
+
+        // No suitable region found.
+        None
+    }
+
+    fn alloc_from_region(region: &ListNode, size: usize, align: usize)
+        -> Result<usize, ()>
+    {
+        let alloc_start = align_up(region.start_addr(), align);
+        let alloc_end = alloc_start.checked_add(size).ok_or(())?;
+
+        if alloc_end > region.end_addr() {
+            // too small
+            return Err(());
+        }
+
+        let excess_size = region.end_addr() - alloc_end;
+        if excess_size > 0 && excess_size < mem::size_of::<ListNode>() {
+            return Err(());
+        }
+        Ok(alloc_start)
+    }
 }
