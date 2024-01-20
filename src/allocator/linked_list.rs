@@ -1,3 +1,5 @@
+use super::align_up;
+use core::mem;
 
 struct ListNode {
     size: usize,
@@ -34,6 +36,13 @@ impl LinkedListAllocator {
     }
 
     unsafe fn add_free_region(&mut self, addr: usize, size: usize) {
-        todo!();
+        assert_eq!(align_up(addr, mem::align_of::<ListNode>()), addr);
+        assert!(size >= mem::size_of::<ListNode>());
+
+        let mut node = ListNode::new(size);
+        node.next = self.head.next.take();
+        let node_ptr = addr as *mut ListNode;
+        node_ptr.write(node);
+        self.head.next = Some(&mut *node_ptr);
     }
 }
