@@ -15,6 +15,7 @@ use linked_list_allocator::LockedHeap;
 
 pub mod bump;
 pub mod linked_list;
+pub mod fixed_size_block;
 
 use bump::BumpAllocator;
 use linked_list::LinkedListAllocator;
