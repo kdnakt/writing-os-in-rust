@@ -45,7 +45,26 @@ fn list_index(layout: &Layout) -> Option<usize> {
 
 unsafe impl GlobalAlloc for Locked<FixedSizeBlockAllocator> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        todo!();
+        let mut allocator = self.lock();
+        match list_index(&layout) {
+            Some(index) => {
+                match allocator.list_heads[index].take() {
+                    Some(node) => {
+                        allocator.list_heads[index] = node.next.take();
+                        node as *mut ListNode as *mut u8
+                    }
+                    None => {
+                        // allocate new block
+                        let block_size = BLOCK_SIZES[index];
+                        let block_align = block_size;
+                        let layout = Layout::from_size_align(block_size, block_align)
+                            .unwrap();
+                        allocator.fallback_alloc(layout)
+                    }
+                }
+            }
+            None => allocator.fallback_alloc(layout),
+        }
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
