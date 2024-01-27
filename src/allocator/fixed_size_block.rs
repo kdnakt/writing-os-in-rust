@@ -1,6 +1,10 @@
 
-use alloc::alloc::Layout;
+use alloc::alloc::{
+    GlobalAlloc,
+    Layout,
+};
 use core::ptr;
+use super::Locked;
 
 const BLOCK_SIZES: &[usize] = &[8, 16, 32, 64, 128, 256, 512, 1024, 2048];
 
@@ -37,4 +41,14 @@ impl FixedSizeBlockAllocator {
 fn list_index(layout: &Layout) -> Option<usize> {
     let required_block_size = layout.size().max(layout.align());
     BLOCK_SIZES.iter().position(|&s| s >= required_block_size)
+}
+
+unsafe impl GlobalAlloc for Locked<FixedSizeBlockAllocator> {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        todo!();
+    }
+
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        todo!();
+    }
 }
