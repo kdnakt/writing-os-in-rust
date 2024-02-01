@@ -179,6 +179,14 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     core::mem::drop(reference_counted);
     println!("reference count is {} now", Rc::strong_count(&cloned_reference));
 
+    let mut heap_value = Box::new(SelfReferential {
+        self_ptr: 0 as *const _,
+    });
+    let ptr = &*heap_value as *const SelfReferential;
+    heap_value.self_ptr = ptr;
+    println!("heap value at: {:p}", heap_value);
+    println!("internal reference: {:p}", heap_value.self_ptr);
+
     #[cfg(test)]
     test_main();
 
@@ -188,6 +196,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     //     print!("-"); // this may cause deadlock
     // }
     blog_os::hlt_loop();
+}
+
+struct SelfReferential {
+    self_ptr: * const Self,
 }
 
 #[test_case]
