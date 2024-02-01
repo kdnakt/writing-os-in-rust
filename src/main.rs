@@ -186,6 +186,11 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     heap_value.self_ptr = ptr;
     println!("heap value at: {:p}", heap_value);
     println!("internal reference: {:p}", heap_value.self_ptr);
+    let stack_value = core::mem::replace(&mut *heap_value, SelfReferential {
+        self_ptr: 0 as *const _,
+    });
+    println!("value at: {:p}", &stack_value);
+    println!("internal reference: {:p}", stack_value.self_ptr);
 
     #[cfg(test)]
     test_main();
