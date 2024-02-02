@@ -18,7 +18,11 @@ use bootloader::{
     BootInfo,
     entry_point,
 };
-use core::panic::PanicInfo;
+use core::{
+    panic::PanicInfo,
+    pin::Pin,
+    marker::PhantomPinned,
+};
 use blog_os::println;
 
 // fn main() {
@@ -179,18 +183,23 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     core::mem::drop(reference_counted);
     println!("reference count is {} now", Rc::strong_count(&cloned_reference));
 
-    let mut heap_value = Box::new(SelfReferential {
+    let mut heap_value = Box::pin(SelfReferential {
         self_ptr: 0 as *const _,
+        _pin: PhantomPinned,
     });
     let ptr = &*heap_value as *const SelfReferential;
-    heap_value.self_ptr = ptr;
+    // heap_value.self_ptr = ptr;
+    unsafe {
+        let mut_ref = Pin::as_mut(&mut heap_value);
+        Pin::get_unchecked_mut(mut_ref).self_ptr = ptr;
+    }
     println!("heap value at: {:p}", heap_value);
     println!("internal reference: {:p}", heap_value.self_ptr);
-    let stack_value = core::mem::replace(&mut *heap_value, SelfReferential {
-        self_ptr: 0 as *const _,
-    });
-    println!("value at: {:p}", &stack_value);
-    println!("internal reference: {:p}", stack_value.self_ptr);
+    // let stack_value = core::mem::replace(&mut *heap_value, SelfReferential {
+    //     self_ptr: 0 as *const _,
+    // });
+    // println!("value at: {:p}", &stack_value);
+    // println!("internal reference: {:p}", stack_value.self_ptr);
 
     #[cfg(test)]
     test_main();
@@ -205,6 +214,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
 struct SelfReferential {
     self_ptr: * const Self,
+    _pin: PhantomPinned,
 }
 
 #[test_case]
