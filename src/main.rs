@@ -24,6 +24,10 @@ use core::{
     marker::PhantomPinned,
 };
 use blog_os::println;
+use blog_os::task::{
+    Task,
+    simple_executor::SimpleExecutor,
+};
 
 // fn main() {
 //     // println!("Hello, world!");
@@ -201,6 +205,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // println!("value at: {:p}", &stack_value);
     // println!("internal reference: {:p}", stack_value.self_ptr);
 
+    let mut executor = SimpleExecutor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.run();
+
     #[cfg(test)]
     test_main();
 
@@ -220,4 +228,13 @@ struct SelfReferential {
 #[test_case]
 fn trivial_assertion() {
     assert_eq!(1, 1);
+}
+
+async fn async_number() -> u32 {
+    42
+}
+
+async fn example_task() {
+    let num = async_number().await;
+    println!("async number: {}", num);
 }
