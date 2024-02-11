@@ -16,3 +16,16 @@ pub(crate) fn add_scancode(scancode: u8) {
         println!("WARNING: scancode queue uninitialized");
     }
 }
+
+pub struct ScancodeStream {
+    _private: (),
+}
+
+impl ScancodeStream {
+    // This is the only way to construct the type
+    pub fn new() -> Self {
+        SCANCODE_QUEUE.try_init_once(|| ArrayQueue::new(100))
+            .expect("ScancodeStream::new should only be called once");
+        ScancodeStream { _private: () }
+    }
+}
