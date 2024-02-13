@@ -8,9 +8,13 @@ use core::{
         Context,
     },
 };
-use futures_util::stream::Stream;
+use futures_util::{
+    stream::Stream,
+    task::AtomicWaker,
+};
 
 static SCANCODE_QUEUE: OnceCell<ArrayQueue<u8>> = OnceCell::uninit();
+static WAKER: AtomicWaker = AtomicWaker::new();
 
 /// called from keyboard interrupt handler
 ///
@@ -43,8 +47,16 @@ impl Stream for ScancodeStream {
 
     fn poll_next(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<u8>> {
         let queue = SCANCODE_QUEUE.try_get().expect("not initialized");
+        if let Ok(scancode) = queue.pop() {
+            return Poll::Ready(Some(scancode));
+        }
+
+        WAKER.register(&cx.waker());
         match queue.pop() {
-            Ok(scancode) => Poll::Ready(Some(scancode)),
+            Ok(scancode) => {
+                WAKER.take();
+                Poll::Ready(Some(scancode))
+            }
             Err(crossbeam_queue::PopError) => Poll::Pending,
         }
     }
