@@ -26,6 +26,7 @@ use core::{
 use blog_os::println;
 use blog_os::task::{
     Task,
+    keyboard,
     simple_executor::SimpleExecutor,
 };
 
@@ -207,6 +208,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let mut executor = SimpleExecutor::new();
     executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
 
     #[cfg(test)]
