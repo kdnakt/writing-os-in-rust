@@ -90,4 +90,10 @@ impl Executor {
             }
         }
     }
+
+    pub fn run(&mut self) -> ! {
+        loop {
+            self.run_ready_tasks();
+        }
+    }
 }

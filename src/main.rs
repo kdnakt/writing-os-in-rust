@@ -28,6 +28,7 @@ use blog_os::task::{
     Task,
     keyboard,
     simple_executor::SimpleExecutor,
+    executor::Executor,
 };
 
 // fn main() {
@@ -206,7 +207,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // println!("value at: {:p}", &stack_value);
     // println!("internal reference: {:p}", stack_value.self_ptr);
 
-    let mut executor = SimpleExecutor::new();
+    // let mut executor = SimpleExecutor::new();
+    let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
     executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
